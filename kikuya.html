@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>景品・換金計算ツール</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 1.4rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .rate-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .rate-btn {
+            padding: 12px 0;
+            font-size: 1rem;
+            font-weight: bold;
+            border: 2px solid #ddd;
+            background-color: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .rate-btn.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #0056b3;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.3rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        .result-title {
+            font-weight: bold;
+            color: #333;
+            margin-top: 20px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+        }
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 1.1rem;
+        }
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #d9534f;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>景品・換金 計算ツール</h1>
+    
+    <div class="rate-buttons">
+        <button class="rate-btn active" onclick="selectRate('5S')">5S</button>
+        <button class="rate-btn" onclick="selectRate('20S')">20S</button>
+        <button class="rate-btn" onclick="selectRate('4P')">4P</button>
+        <button class="rate-btn" onclick="selectRate('1P')">1P</button>
+    </div>
+
+    <div class="input-group">
+        <label id="input-label">5Sの枚数を入力：</label>
+        <input type="number" id="amount-input" placeholder="数値を入力" oninput="calculate()">
+    </div>
+
+    <div class="result-title">計算結果</div>
+    <div class="result-row">
+        <span>大景品 (4,900円)</span>
+        <span id="res-large">0 個</span>
+    </div>
+    <div class="result-row">
+        <span>中景品 (980円)</span>
+        <span id="res-medium">0 個</span>
+    </div>
+    <div class="result-row">
+        <span>小景品 (190円)</span>
+        <span id="res-small">0 個</span>
+    </div>
+    <div class="result-row" style="color: #666; background-color: #fafafa; padding: 10px; border-radius: 4px;">
+        <span>最終的な余り</span>
+        <span id="res-rem">0 枚</span>
+    </div>
+    <div class="total-row">
+        <span>換金合計額</span>
+        <span id="res-total">0 円</span>
+    </div>
+</div>
+
+<script>
+    // 各レートの条件（大、中、小に必要な枚数・玉数）
+    const rateSettings = {
+        '5S':  { unit: '枚', large: 1023, medium: 205, small: 41 },
+        '20S': { unit: '枚', large: 253,  medium: 51,  small: 11 },
+        '4P':  { unit: '玉', large: 1375, medium: 275, small: 55 },
+        '1P':  { unit: '玉', large: 5500, medium: 1100, small: 22 }
+    };
+
+    // 景品の金額設定
+    const prices = { large: 4900, medium: 980, small: 190 };
+
+    // 初期状態は5S
+    let currentRate = '5S';
+
+    // ボタンが押された時の切り替え処理
+    function selectRate(rate) {
+        currentRate = rate;
+        
+        // ボタンの「アクティブ状態」の見た目を切り替える
+        document.querySelectorAll('.rate-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if(btn.innerText === rate) btn.classList.add('active');
+        });
+
+        // 入力欄のラベル（単位）を自動で切り替える
+        const unit = rateSettings[rate].unit;
+        document.getElementById('input-label').innerText = `${rate}の${unit}数を入力：`;
+        
+        // レートを切り替えたら、その場で再計算する
+        calculate();
+    }
+
+    // あなたのロジック通りの計算メイン処理
+    function calculate() {
+        // 入力された数値を取得（空っぽなら0にする）
+        const inputVal = parseInt(document.getElementById('amount-input').value) || 0;
+        const config = rateSettings[currentRate];
+        
+        let remaining = inputVal;
+
+        // 【1】大景品の計算
+        // 商（個数）を出す
+        const numLarge = Math.floor(remaining / config.large);
+        // 余りを次の計算にまわす
+        remaining = remaining % config.large;
+
+        // 【2】中景品の計算
+        // 前の余りを、さらに中で割って商（個数）を出す
+        const numMedium = Math.floor(remaining / config.medium);
+        // さらに出た余りを次にまわす
+        remaining = remaining % config.medium;
+
+        // 【3】小景品の計算
+        // 前の余りを、さらに小で割って商（個数）を出す
+        const numSmall = Math.floor(remaining / config.small);
+        // 最後に残ったものが「最終的な余り」
+        remaining = remaining % config.small;
+
+        // 【4】金額の合計を計算
+        const totalCash = (numLarge * prices.large) + (numMedium * prices.medium) + (numSmall * prices.small);
+
+        // 各結果を画面に見やすく表示（3桁カンマ区切り）
+        document.getElementById('res-large').innerText = `${numLarge.toLocaleString()} 個`;
+        document.getElementById('res-medium').innerText = `${numMedium.toLocaleString()} 個`;
+        document.getElementById('res-small').innerText = `${numSmall.toLocaleString()} 個`;
+        document.getElementById('res-rem').innerText = `${remaining.toLocaleString()} ${config.unit}`;
+        document.getElementById('res-total').innerText = `${totalCash.toLocaleString()} 円`;
+    }
+</script>
+
+</body>
+</html>
