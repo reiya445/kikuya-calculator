@@ -4,88 +4,204 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>景品・換金計算ツール</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background-color: #f4f6f9;
+        * {
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
+
         .container {
             background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 400px;
+            max-width: 450px;
         }
+
         h1 {
             text-align: center;
-            font-size: 1.4rem;
-            color: #333;
-            margin-bottom: 20px;
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
+
         .rate-buttons {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 32px;
         }
+
         .rate-btn {
-            padding: 12px 0;
-            font-size: 1rem;
-            font-weight: bold;
-            border: 2px solid #ddd;
-            background-color: #fff;
-            border-radius: 8px;
+            padding: 14px 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: 2px solid #e0e6ed;
+            background-color: #f8f9fb;
+            border-radius: 10px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            color: #666;
         }
+
+        .rate-btn:hover {
+            border-color: #3498db;
+            background-color: #ecf0f7;
+        }
+
         .rate-btn.active {
-            background-color: #007bff;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border-color: #0056b3;
+            border-color: #667eea;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
+
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 28px;
         }
+
         label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #555;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.95rem;
         }
+
         input[type="number"] {
             width: 100%;
-            padding: 12px;
-            font-size: 1.3rem;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
+            padding: 14px 16px;
+            font-size: 1.2rem;
+            border: 2px solid #e0e6ed;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-family: 'Noto Sans JP', sans-serif;
+            font-weight: 500;
         }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input[type="number"]::placeholder {
+            color: #bbb;
+        }
+
+        .result-section {
+            margin-top: 32px;
+        }
+
         .result-title {
-            font-weight: bold;
-            color: #333;
-            margin-top: 20px;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 5px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 16px;
+            font-size: 1.1rem;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #667eea;
         }
+
         .result-row {
             display: flex;
             justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #eee;
-            font-size: 1.1rem;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 1rem;
+            color: #555;
         }
+
+        .result-row:last-of-type {
+            border-bottom: none;
+        }
+
+        .result-row span:first-child {
+            font-weight: 500;
+        }
+
+        .result-row span:last-child {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .remainder-row {
+            background-color: #f8f9fb;
+            padding: 14px 12px;
+            border-radius: 8px;
+            margin: 12px 0;
+        }
+
+        .remainder-row span:last-child {
+            color: #999;
+        }
+
         .total-row {
             display: flex;
             justify-content: space-between;
-            padding: 15px 0;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #d9534f;
+            align-items: center;
+            padding: 18px 0;
+            margin-top: 20px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            padding: 18px 16px;
+        }
+
+        .total-row span:last-child {
+            font-size: 1.6rem;
+        }
+
+        /* レスポンシブ対応 */
+        @media (max-width: 480px) {
+            .container {
+                padding: 28px 20px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+                margin-bottom: 24px;
+            }
+
+            .rate-buttons {
+                gap: 10px;
+                margin-bottom: 24px;
+            }
+
+            .rate-btn {
+                font-size: 0.85rem;
+                padding: 12px 0;
+            }
+
+            input[type="number"] {
+                font-size: 1.1rem;
+                padding: 12px 14px;
+            }
+
+            .total-row {
+                font-size: 1.2rem;
+            }
+
+            .total-row span:last-child {
+                font-size: 1.4rem;
+            }
         }
     </style>
 </head>
@@ -106,26 +222,28 @@
         <input type="number" id="amount-input" placeholder="数値を入力" oninput="calculate()">
     </div>
 
-    <div class="result-title">計算結果</div>
-    <div class="result-row">
-        <span>大景品 (4,900円)</span>
-        <span id="res-large">0 個</span>
-    </div>
-    <div class="result-row">
-        <span>中景品 (980円)</span>
-        <span id="res-medium">0 個</span>
-    </div>
-    <div class="result-row">
-        <span>小景品 (190円)</span>
-        <span id="res-small">0 個</span>
-    </div>
-    <div class="result-row" style="color: #666; background-color: #fafafa; padding: 10px; border-radius: 4px;">
-        <span>最終的な余り</span>
-        <span id="res-rem">0 枚</span>
-    </div>
-    <div class="total-row">
-        <span>換金合計額</span>
-        <span id="res-total">0 円</span>
+    <div class="result-section">
+        <div class="result-title">計算結果</div>
+        <div class="result-row">
+            <span>大景品 (4,900円)</span>
+            <span id="res-large">0 個</span>
+        </div>
+        <div class="result-row">
+            <span>中景品 (980円)</span>
+            <span id="res-medium">0 個</span>
+        </div>
+        <div class="result-row">
+            <span>小景品 (190円)</span>
+            <span id="res-small">0 個</span>
+        </div>
+        <div class="result-row remainder-row">
+            <span>最終的な余り</span>
+            <span id="res-rem">0 枚</span>
+        </div>
+        <div class="total-row">
+            <span>換金合計額</span>
+            <span id="res-total">0 円</span>
+        </div>
     </div>
 </div>
 
