@@ -14,7 +14,9 @@
 
         body {
             font-family: 'Noto Sans JP', 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background:
+                linear-gradient(rgba(10, 30, 60, 0.18), rgba(10, 30, 60, 0.18)),
+                url('./kikuya.png') center / cover fixed no-repeat;
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -23,7 +25,7 @@
         }
 
         .container {
-            background: white;
+            background: rgba(255, 255, 255, 0.92);
             padding: 40px;
             border-radius: 16px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
@@ -42,7 +44,7 @@
 
         .rate-buttons {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 12px;
             margin-bottom: 32px;
         }
@@ -211,6 +213,7 @@
     <h1>景品・換金 計算ツール</h1>
     
     <div class="rate-buttons">
+        <button class="rate-btn" onclick="selectRate('2S')">2S</button>
         <button class="rate-btn active" onclick="selectRate('5S')">5S</button>
         <button class="rate-btn" onclick="selectRate('20S')">20S</button>
         <button class="rate-btn" onclick="selectRate('4P')">4P</button>
@@ -251,6 +254,7 @@
     // 各レートの条件（大、中、小に必要な枚数・玉数）
     const rateSettings = {
         '5S':  { unit: '枚', large: 1023, medium: 205, small: 41 },
+        '2S':  { unit: '枚', large: 2750, medium: 550, small: 110 },
         '20S': { unit: '枚', large: 253,  medium: 51,  small: 11 },
         '4P':  { unit: '玉', large: 1250, medium: 250, small: 50 },
         '1P':  { unit: '玉', large: 5000, medium: 1000, small: 200 }
